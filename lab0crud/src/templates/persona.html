@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
+        crossorigin="anonymous"></script>
+    <style>
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+    <script>
+        function returnToPreviousPage() {
+            window.history.back();
+        }
+    </script>
+
+</head>
+
+<body class="" style="background: gray;">
+    <a href="{{ url_for('home') }}" class="btn btn-success m-3">Inicio</a>
+    <h1 class="text-center mt-5 mb-5 text-primary">Gestión de personas</h1>
+    {% set viviendas_actuales = [] %}
+    {% set municipios_actuales = [] %}
+    {% for persona in data %}
+    {% for vivienda in list_viviendas %}
+    {% if vivienda.id == persona.id_vivienda_actual %}
+    {% set valor = '(' ~ persona.id_vivienda_actual ~ ')-' ~ vivienda.direccion %}
+    {% set _ = viviendas_actuales.append(valor) %}
+    {% endif %}
+    {% endfor %}
+    {% for m in list_municipios %}
+    {% if m.id == persona.id_municipio_origen %}
+    {% set valor = '(' ~ m.id ~ ')-' ~ m.nombre %}
+    {% set _ = municipios_actuales.append(valor) %}
+    {% endif %}
+
+    {% endfor %}
+    {% endfor %}
+
+
+
+    <div class="container">
+        <div class="card shadow">
+            <div class="card-body">
+                <form action="/persona_add" method="POST" onsubmit="returnToPreviousPage;">
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for='nombre'>Nombre</label>
+                            <input type="text" class="form-control mb-3" name="nombre">
+                        </div>
+                        <div class="col">
+                            <label for='t_doc'>Tipo de documento</label>
+                            <select class="form-select" id="sexo" name="t_doc">
+                                <option value="none" selected readonly hidden> </option>
+                                <option value="CC">CC</option>
+                                <option value="TI">TI</option>
+                                <option value="CE">CE</option>
+                                <option value="Pasaporte">Pasaporte</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <label for="n_doc">Documento</label>
+                        <input class="form-control mb-3" type="number" min="0" name="n_doc">
+                    </div>
+                    <div class="col">
+                        <label for='nacimiento'>Fecha de nacimiento</label>
+                        <input type="date" class="form-control mb-3" name="nacimiento">
+                    </div>
+                    <div class="col">
+                        <label for="sexo">Sexo</label>
+                        <select class="form-select" id="sexo" name="sexo">
+                            <option value="none" selected readonly hidden> </option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="No binario">No binario</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for='tel_cel'>Teléfono o celular</label>
+                        <input type="number" min="0" class="form-control mb-3" name="tel_cel">
+                    </div>
+                    <div class="col">
+                        <label for='vivienda_actual'>Vivienda actual</label>
+                        <select id="id_municipio" class="form-control" name="id_vivienda_actual">
+                            <option value="none" selected readonly hidden> </option>
+                            {% for vivienda in list_viviendas %}
+                            <option value="{{vivienda.id}}">({{vivienda.id}})-{{vivienda.direccion}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for='id_municipio_origen'>Municipio origen</label>
+                        <select id="id_municipio_origen" class="form-control" name="id_municipio_origen">
+                            <option value="none" selected readonly hidden> </option>
+                            {% for m in list_municipios %}
+                            <option value="{{m.id}}">({{m.id}})-{{m.nombre}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+            </div>
+            <div class="text-center">
+                <button class="btn btn-success mb-3 mt-4" type="submit">Guardar</button>
+            </div>
+            </form>
+            <br>
+
+            <!-- Tabla -->
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Tipo de documento</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Fecha de nacimiento</th>
+                        <th scope="col">Sexo</th>
+                        <th scope="col">Tel/Cel</th>
+                        <th scope="col">Vivienda actual</th>
+                        <th scope="col">Municipio origen</th>
+
+                       
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for d in (data) %}
+                    
+                    <tr>
+                        <td>{{d.id}}</td>
+                        <td>{{d.tipo_doc}}</td>
+                        <td>{{d.nombre}}</td>
+                        <td>{{d.fecha_nac}}</td>
+                        <td>{{d.sexo}}</td>
+                        <td>{{d.telefono}}</td>
+                        <td>{{viviendas_actuales[loop.index0]}}</td>
+                        <td>
+                            {{municipios_actuales[loop.index0]}}
+                        </td>
+                        <td><button class="btn btn-success btn-sm" id="btn-edit{{d.id}}" data-bs-toggle="modal"
+                                data-bs-target="#modal{{d.id}}">Editar</button></td>
+                        <td><a href="{{url_for('persona_delete', id=d.id)}}" class="btn btn-danger btn-sm">Borrar</a>
+
+
+                        </td>
+                    </tr>
+
+                    <!-- modal -->
+
+                    <div class="modal fade" id="modal{{d.id}}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">{{d.nombre}}</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="/persona_edit/{{d.id}}" method="POST">
+                                        <label for='id'>ID</label>
+                                        <input type="number" min="0" class="form-control mb-3" name="id" value="{{d.id}}"
+                                            readonly>
+                                        <label for='tipo_doc'>Tipo de documento</label>
+                                            <select class="form-select" id="sexo" name="t_doc">
+                                                {% set tipodoc = ['CC','TI', 'CE','Pasaporte'] %}
+                                                {% for t in tipodoc %}
+                                                {% if t == d.tipo_doc %}
+                                                <option value="{{ t }}" selected>{{ t }}</option>
+                                                {% else %}
+                                                <option value="{{t}}">{{ t }}</option>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </select>
+
+                                        <label for='nombre'>Nombre</label>
+                                        <input type="text" class="form-control mb-3" name="nombre" value="{{d.nombre}}">
+
+
+                                        <label for='fecha_nac'>Fecha de nacimiento</label>
+                                        <input type="date" class="form-control mb-3" name="fecha_nac"
+                                            value="{{d.fecha_nac}}" >
+
+                                        <label for='sexo'>Sexo</label>
+                                        <select class="form-select" id="selectBox" name="sexo">
+                                            {% set sexos = {'Masculino':'M', 'Femenino':'F', 'No binario':'NB'} %}
+                                            {% for s in sexos %}
+                                            {% if d.sexo == s %}
+                                            <option value="{{ s }}" selected>{{ s }}</option>
+                                            {% else %}
+                                            <option value="{{s}}">{{ s }}</option>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </select>
+
+                                        <label for=''>Teléfono o celular</label>
+                                        <input type="number" min="0" class="form-control mb-3" name="telefono"
+                                            value="{{d.telefono}}">
+                                        <label for='vivienda_actual'>Vivienda actual</label>
+                                        <select id="vivienda_actual" class="form-control" name="id_vivienda_actual">
+                                            {% for vivienda in list_viviendas %}
+                                            {% if d.id_vivienda == vivienda.id %}
+                                            <option value="{{vivienda.id}}" selected>
+                                                viviendas_actuales[loop.index0]</option>
+                                            {% else %}
+                                            <option value="{{vivienda.id}}">({{vivienda.id}})-{{vivienda.direccion}}
+                                            </option>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </select>
+
+                                        <label for="id_municipio_origen">Municipio origen</label>
+                                        <select id="id_municipio_origen" class="form-control" name="id_municipio_origen">
+                                            {% for m in list_municipios %}
+                                            <option value="{{m.id}}">({{m.id}})-{{m.nombre}}</option>
+                                            {% if d.id_municipio_origen == m.id %}
+                                            <option value="{{m.id}}" selected>
+                                                viviendas_actuales[loop.index0]</option>
+                                            {% else %}
+                                            <option value="{{m.id}}">({{m.id}})-{{m.nombre}}
+                                            </option>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </select>
+
+
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        {% endfor %}
+
+                </tbody>
+
+            </table>
+
+
+        </div>
+    </div>
+    </div>
+
+</body>
+
+</html>

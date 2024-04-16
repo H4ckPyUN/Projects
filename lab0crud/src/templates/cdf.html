@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cabeza de Familia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
+        crossorigin="anonymous"></script>
+    <script>document.getElementById('datePicker').valueAsDate = new Date();</script>
+    <style>
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+
+</head>
+
+<body class="" style="background: gray;">
+    <a href="{{ url_for('home') }}" class="btn btn-success m-3">Inicio</a>
+    <h1 class="text-center mt-5 mb-5 text-primary">Gestión de cabezas de familia (CDF)</h1>
+
+    <div class="container">
+        <div class="card shadow">
+            <div class="card-body">
+                <form action="/cdf_add" method="POST">
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for='id_persona'>ID de la persona usuario</label>
+                            <input type="number" min="0" class="form-control mb-3" name="id_persona" value="{{data_pred['id']}}"
+                                readonly>
+                        </div>
+                        <div class="col">
+                            <label>ID de la persona cabeza de familia (CDF)</label>
+                            <input type="number" min="0" class="form-control mb-3" name="id_cdf">
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-success mb-3 mt-4" type="submit">Guardar</button>
+                        </div>
+                    </div>
+
+                </form>
+
+
+                <!-- Tabla -->
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col"># Registro</th>
+                            <th scope="col">Documento</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Documento de Cabeza de familia</th>
+                            <th scope="col">Nombre de Cabeza de familia</th>
+                            <th scope="col">Fecha del registro</th>
+                            <th scope="col">Editar</th>
+                            <th scope="col">Borrar</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for d in data %}
+                        <tr>
+                            <td>{{d.id}}</td>
+                            <td>{{d.id_persona}}</td>
+                            <td>{{d.nombre_persona1}}</td>
+                            <td>{{d.id_cdf}}</td>
+                            <td>{{d.nombre_persona2}}</td>
+                            <td>{{d.fecha_registro}}</td>
+
+                            <td><button class="btn btn-success btn-sm" id="btn-edit{{d.id}}" data-bs-toggle="modal"
+                                    data-bs-target="#modal{{d.id}}">Editar</button></td>
+                            <td><a href="{{url_for('cdf_delete', id_r=d.id, id_p=d.id_persona)}}"
+                                    class="btn btn-danger btn-sm">Borrar</a></td>
+                        </tr>
+
+                        <!-- modal -->
+
+                        <div class="modal fade" id="modal{{d.id}}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Editar</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="/cdf_edit/{{d.id}}" method="post">
+                                            <label for="id"># Registro</label>
+                                            <input type="text" class="form-control mb-3" name="id" value="{{d.id}}"
+                                                readonly>
+                                            <label for="id_persona">ID Persona: {{d.nombre_persona1}}</label>
+                                            <input type="text" class="form-control mb-3" name="id_persona"
+                                                value="{{d.id_persona}}" readonly>
+                                            <label for="id_cdf">Documento de Cabeza de familia:
+                                                {{d.nombre_persona2}}</label>
+                                            <input class="form-control mb-3" type="number" min="0" name="id_cdf"
+                                                value="{{d.id_cdf}}">
+                                            <label hidden for="fecha_registro">Fecha de registro</label>
+                                            <input hidden display type="text" class="form-control mb-3"
+                                                name="fecha_registro" value="{{d.fecha_registro}}">
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+                            {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

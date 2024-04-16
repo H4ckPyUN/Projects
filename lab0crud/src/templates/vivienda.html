@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viviendas</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body class="" style="background: gray;">
+
+    <a href="{{ url_for('home') }}" class="btn btn-success m-3">Inicio</a>
+    <h1 class="text-center mt-3 text-primary">Gestión de viviendas</h1>
+
+    <div class="container">
+        <div class="card shadow">
+            <div class="card-body">
+
+                <form action="/vivienda_add" method="POST" onsubmit="return validarFormulario()">
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label>Dirección</label>
+                            <input type="text" class="form-control mb-3" name="direccion" id="form_direccion">
+                        </div>
+                        <div class="col">
+                            <label for="id_municipio">Municipio</label>
+                            <select id="id_municipio" class="form-control" name="id_municipio" id="form_municipio">
+                                <option value="" readonly selected>Seleccione municipio</option>
+                                {% for municipio in list_municipios %}
+                                <option value="{{municipio.id}}">{{municipio.nombre}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label for="">Capacidad</label>
+                            <input type="number" min="0" class="form-control mb-3" name="capacidad" id="form_capacidad">
+                        </div>
+                        <div class="col">
+                            <label for="area">Área</label>
+                            <input type="number" min="0" class="form-control mb-3" name="area" id="form_area">
+
+                        <div class="col">
+                            <label for="estrato">Estrato</label>
+                            <select id="estrato" class="form-control" name="estrato">
+                                <option value="{{1}}" selected>1</option>
+                                <option value="{{2}}">2</option>
+                                <option value="{{3}}">3</option>
+                                <option value="{{4}}">4</option>
+                                <option value="{{5}}">5</option>
+                                <option value="{{6}}">6</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label for="categoria">Categoría</label>
+                            <select id="categoria" class="form-control" name="categoria">
+                                <option value="casa" selected>casa</option>
+                                <option value="apartamento">apartamento</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label>Niveles</label>
+                            <input type="number" min="0" class="form-control mb-3" name="niveles" , id="form_niveles">
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-success mb-3 mt-4" type="submit">Guardar</button>
+                        </div>
+                    </div>
+                </form>
+
+
+                <!-- Tabla -->
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Dirección</th>
+                            <th scope="col">Municipio</th>
+                            <th scope="col">Capacidad</th>
+                            <th scope="col">Niveles</th>
+                            <th scope="col">Área</th>
+                            <th scope="col">Estrato</th>
+                            <th scope="col">Categoría</th>
+                            <th scope="col">Editar</th>
+                            <th scope="col">Borrar</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for d in data %}
+                        <tr>
+                            <td>{{d.id}}</td>
+                            <td>{{d.direccion}}</td>
+                            <td>{{d.nombre_municipio}}</td>
+                            <td>{{d.capacidad}}</td>
+                            <td>{{d.niveles}}</td>
+                            <td>{{d.area}}</td>
+                            <td>{{d.estrato}}</td>
+                            <td>{{d.categoria}}</td>
+                            <td><button type="button" class="btn btn-success" data-toggle="modal"
+                                    data-target="#modal{{d.id}}">
+                                    Editar</button>
+
+                            </td>
+                            <td><a href="{{url_for('vivienda_delete', id=d.id)}}"
+                                    class="btn btn-danger btn-sm">Borrar</a></td>
+                        </tr>
+
+                        <!-- modal -->
+
+                        <div class="modal fade" id="modal{{d.id}}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Vivienda de la dirección:
+                                            {{d.direccion}}</h1>
+                                        <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="/vivienda_edit/{{d.id}}" method="POST">
+                                            <label for="id"># Registro</label>
+                                            <input type="number" min="0" class="form-control mb-3" name="id"
+                                                value="{{d.id}}" readonly>
+                                            <label for="direccion">Dirección</label>
+                                            <input type="text" class="form-control mb-3" name="direccion"
+                                                value="{{d.direccion}}">
+                                            <label for="municipio">Municipio</label>
+                                            <select id="id_municipio" class="form-control" name="id_municipio">
+                                                {% for municipio in list_municipios %}
+                                                {% if d.id_municipio == municipio.id %}
+                                                <option value="{{municipio.id}}" selected>{{municipio.nombre}}</option>
+                                                {% else %}
+                                                <option value="{{municipio.id}}">{{municipio.nombre}}</option>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                            <label for="capacidad">Capacidad</label>
+                                            <input type="number" min="0" class="form-control mb-3" name="capacidad"
+                                                value="{{d.capacidad}}">
+                                            <label for="niveles">Niveles</label>
+                                            <input type="number" min="1" class="form-control mb-3" name="niveles"
+                                                value="{{d.niveles}}">
+                                            <label for="area">Área</label>
+                                            <input type="number" min="0" class="form-control mb-3" name="area"
+                                                value="{{d.area}}">
+                                            <label for="estrato">Estrato</label>
+                                            <select id="estrato" class="form-control" name="estrato">
+                                                <option value="{{1}}" selected>1</option>
+                                                <option value="{{2}}">2</option>
+                                                <option value="{{3}}">3</option>
+                                                <option value="{{4}}">4</option>
+                                                <option value="{{5}}">5</option>
+                                                <option value="{{6}}">6</option>
+                                            </select>
+
+                                            <label for="categoria">Categoría</label>
+                                            <select id="categoria" class="form-control" name="categoria">
+                                                <option value="casa" selected>casa</option>
+                                                <option value="apartamento">apartamento</option>
+                                            </select>
+
+
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agregar Bootstrap JS y jQuery (Requeridos por Bootstrap) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+
+        function validarFormulario() {
+            // Obtener referencias a los campos del formulario
+            var campos = ["form_direccion", "form_municipio", "form_capacidad", "form_niveles"];
+            // Realizar validación, por ejemplo, si ambos campos están completos
+            for (var i = 0; i < campos.length; i++) {
+                var campo = document.getElementById(campos[i]).value;
+                if (campo === "") {
+                    // Si un campo está vacío, muestra un mensaje de error y evita el envío del formulario
+                    alert("Por favor, complete todos los campos");
+                    return false;
+                }
+            }
+
+            // Si la validación es exitosa, permite que el formulario se envíe
+            return true;
+
+        }
+    </script>
+</body>
+
+</html>
